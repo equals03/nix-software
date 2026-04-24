@@ -1,0 +1,13 @@
+**/repl-result
+**/repl-result-*
+**/result
+**/result-*
+.cache
+.local
+.direnv
+doc/index.html
+pkgs/_sources/.shake*
+managed_context
+test_suite_analysis
+/*.qcow2
+.std

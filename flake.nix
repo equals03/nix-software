@@ -1,0 +1,37 @@
+{
+  outputs = inputs: import ./outputs.nix inputs;
+
+  #nixConfig = {
+  #  extraSubstituters = [];
+  #  extraTrustedPublicKeys = [];
+  #};
+
+  inputs = {
+    nixpkgs.url = "github:nixos/nixpkgs/nixpkgs-unstable";
+
+    # software
+    conch.url = "github:equals03/conch";
+    cursor.url = "github:tylergets/cursor-flake";
+    codex-cli.url = "github:sadjow/codex-cli-nix";
+    pi-mono .url = "github:lukasl-dev/pi-mono.nix";
+    niri.url = "github:YaLTeR/niri";
+    work-trunk.url = "github:max-sixty/worktrunk";
+    xwayland-satellite.url = "github:Supreeeme/xwayland-satellite";
+    zen-browser.url = "github:youwen5/zen-browser-flake";
+
+    # infrastructure
+    flake-parts.url = "github:hercules-ci/flake-parts";
+    nix-pax.url = "github:equals03/nix-pax?ref=feat/additional-aliases";
+
+    import-tree.url = "github:vic/import-tree";
+
+    treefmt-nix = {
+      url = "github:numtide/treefmt-nix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+    devshell = {
+      url = "github:numtide/devshell";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+  };
+}

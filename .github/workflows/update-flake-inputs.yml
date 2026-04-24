@@ -1,0 +1,137 @@
+name: Update Flake Inputs
+
+on:
+  workflow_dispatch:
+    inputs:
+      update_nixpkgs:
+        description: "Also update nixpkgs"
+        required: false
+        default: "false"
+        type: choice
+        options:
+          - "false"
+          - "true"
+
+  schedule:
+    # Daily at 02:00 UTC
+    - cron: "0 2 * * *"
+
+permissions:
+  contents: write
+  id-token: write
+
+concurrency:
+  group: update-flake-inputs
+  cancel-in-progress: false
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Decide update mode
+        id: mode
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            if [ "${{ inputs.update_nixpkgs }}" = "true" ]; then
+              echo "update_nixpkgs=1" >> "$GITHUB_OUTPUT"
+              echo "mode=manual full update" >> "$GITHUB_OUTPUT"
+            else
+              echo "update_nixpkgs=0" >> "$GITHUB_OUTPUT"
+              echo "mode=manual partial update" >> "$GITHUB_OUTPUT"
+            fi
+          elif [ "$(date -u +%u)" = "1" ]; then
+            echo "update_nixpkgs=1" >> "$GITHUB_OUTPUT"
+            echo "mode=weekly Monday full update" >> "$GITHUB_OUTPUT"
+          else
+            echo "update_nixpkgs=0" >> "$GITHUB_OUTPUT"
+            echo "mode=daily partial update" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Checkout master
+        uses: actions/checkout@v4
+        with:
+          ref: master
+
+      - name: Install Nix
+        uses: DeterminateSystems/nix-installer-action@main
+        with:
+          extra-conf: |
+            extra-substituters = https://nix-community.cachix.org
+            extra-trusted-public-keys = nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs=
+            experimental-features = nix-command flakes
+            accept-flake-config = true
+            keep-outputs = true
+            keep-derivations = true
+            trusted-users = root runner
+
+      - name: Enable Magic Nix Cache
+        uses: DeterminateSystems/magic-nix-cache-action@main
+
+      - name: Show Nix cache config
+        shell: bash
+        run: |
+          nix config show | grep -E 'substituters|trusted-substituters|trusted-public-keys|trusted-users|experimental-features|accept-flake-config|keep-outputs|keep-derivations' || true
+          echo
+          echo "NIX_CONFIG:"
+          printf '%s\n' "${NIX_CONFIG:-<unset>}"
+
+      - name: Update inputs resiliently
+        id: update
+        shell: bash
+        env:
+          UPDATE_NIXPKGS: ${{ steps.mode.outputs.update_nixpkgs }}
+        run: |
+          set -euo pipefail
+
+          summary_file="$(mktemp)"
+          status=0
+
+          nix run .#update-inputs-resilient 2>&1 | tee "$summary_file" || status="$?"
+
+          {
+            echo "summary<<EOF"
+            echo "Mode: ${{ steps.mode.outputs.mode }}"
+            echo
+            cat "$summary_file"
+            echo "EOF"
+          } >> "$GITHUB_OUTPUT"
+
+          {
+            echo "## Flake input update summary"
+            echo
+            echo "**Mode:** ${{ steps.mode.outputs.mode }}"
+            echo
+            cat "$summary_file"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+          exit "$status"
+
+      - name: Commit and push if changed
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          if git diff --quiet; then
+            echo "No changes to commit."
+            exit 0
+          fi
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          git add -A
+
+          {
+            echo "Update flake inputs"
+            echo
+            echo "Mode: ${{ steps.mode.outputs.mode }}"
+            echo
+            echo "${{ steps.update.outputs.summary }}"
+          } > /tmp/commit-message.txt
+
+          git commit --file /tmp/commit-message.txt
+          git push origin HEAD:master

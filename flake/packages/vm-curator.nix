@@ -1,0 +1,58 @@
+{lib, ...}: let
+  package = {
+    lib,
+    fetchFromGitHub,
+    rustPlatform,
+    pkg-config,
+    openssl,
+    udev,
+  }:
+    rustPlatform.buildRustPackage rec {
+      pname = "vm-curator";
+      version = "0.4.7";
+
+      src = fetchFromGitHub {
+        owner = "mroboff";
+        repo = "vm-curator";
+        rev = "v${version}";
+        # replace this hash with the actual one after first build
+        hash = "sha256-Nyq/i/MS24+5AaKs6mrsdmjO2BttqVzlLqIL6QEy1OA=";
+      };
+
+      cargoLock = {
+        lockFile = "${src}/Cargo.lock";
+      };
+
+      nativeBuildInputs = [pkg-config];
+
+      buildInputs = [
+        openssl
+        udev
+      ];
+
+      # vm-curator produces a single binary named "vm-curator"
+      # so no extra binaries to hide or rename.
+
+      meta = with lib; {
+        description = "Fast and friendly Rust TUI for managing desktop QEMU/KVM virtual machines";
+        homepage = "https://github.com/mroboff/vm-curator";
+        license = licenses.mit; # project is MIT-licensed
+        platforms = platforms.linux;
+
+        # enrol in the custom 'update-packages' script
+        update.enable = true;
+      };
+    };
+in {
+  perSystem = {
+    pkgs,
+    system,
+    ...
+  }: let
+    vm-curator = pkgs.callPackage package {};
+  in {
+    packages = lib.optionalAttrs (builtins.elem system vm-curator.meta.platforms) {
+      inherit vm-curator;
+    };
+  };
+}
