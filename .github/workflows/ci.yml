@@ -1,0 +1,62 @@
+name: CI
+
+on:
+  pull_request:
+    branches:
+      - master
+
+  push:
+    branches:
+      - master
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  nix-flake-check:
+    runs-on: ubuntu-latest
+    environment: default
+
+    if: >
+      github.event_name != 'pull_request' ||
+      github.event.pull_request.head.repo.full_name == github.repository
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install Nix
+        uses: cachix/install-nix-action@v31.10.5
+        with:
+          github_access_token: ${{ secrets.GITHUB_TOKEN }}
+          extra-conf: |
+            extra-substituters = https://nix-community.cachix.org
+            extra-trusted-public-keys = nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs=
+            experimental-features = nix-command flakes
+            accept-flake-config = true
+            keep-outputs = true
+            keep-derivations = true
+            trusted-users = root runner
+
+      - name: Enable Magic Nix Cache
+        uses: DeterminateSystems/magic-nix-cache-action@v13
+        with:
+          diagnostic-endpoint: ""
+          use-flakehub: false
+
+      - name: Setup Attic cache
+        uses: ryanccn/attic-action@v0.5.0
+        with:
+          endpoint: ${{ vars.ATTIC_ENDPOINT }}
+          cache: ${{ vars.ATTIC_CACHE }}
+          token: ${{ secrets.ATTIC_TOKEN }}
+
+      - name: Check flake
+        shell: bash
+        run: |
+          set -euo pipefail
+          nix flake check -L
