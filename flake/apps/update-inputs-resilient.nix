@@ -139,10 +139,77 @@
         fi
       '';
     };
+
+    ci-update-inputs = pkgs.writeShellApplication {
+      name = "ci-update-inputs";
+
+      runtimeInputs = with pkgs; [
+        coreutils
+        gawk
+        update-inputs-resilient
+      ];
+
+      text = ''
+        set -euo pipefail
+
+        update_mode="''${UPDATE_MODE:-unknown update mode}"
+        github_output="''${GITHUB_OUTPUT:-}"
+
+        log_file="$(mktemp)"
+        summary_file="$(mktemp)"
+        status=0
+
+        update-inputs-resilient > "$log_file" 2>&1 || status="$?"
+
+        awk '
+          /^Markdown summary:/ { capture = 1; next }
+          capture { print }
+        ' "$log_file" > "$summary_file"
+
+        if [ ! -s "$summary_file" ]; then
+          {
+            echo "No structured update summary was found."
+            echo
+            echo "See the GitHub Actions logs for details."
+          } > "$summary_file"
+        fi
+
+        if [ -n "$github_output" ]; then
+          {
+            echo "summary<<EOF"
+            echo "Mode: $update_mode"
+            echo
+            cat "$summary_file"
+            echo "EOF"
+          } >> "$github_output"
+        fi
+
+        echo "Mode: $update_mode"
+        echo
+        cat "$summary_file"
+
+        if [ "$status" -ne 0 ]; then
+          echo
+          echo "Updater failed. Full log:"
+          echo
+          cat "$log_file"
+        fi
+
+        exit "$status"
+      '';
+    };
   in {
     apps.update-inputs-resilient = {
       type = "app";
       program = "${update-inputs-resilient}/bin/update-inputs-resilient";
     };
+
+    apps.ci-update-inputs = {
+      type = "app";
+      program = "${ci-update-inputs}/bin/ci-update-inputs";
+    };
+
+    packages.update-inputs-resilient = update-inputs-resilient;
+    packages.ci-update-inputs = ci-update-inputs;
   };
 }

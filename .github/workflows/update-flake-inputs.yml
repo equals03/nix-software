@@ -27,6 +27,7 @@ concurrency:
 jobs:
   update:
     runs-on: ubuntu-latest
+    environment: default
 
     steps:
       - name: Decide update mode
@@ -57,7 +58,7 @@ jobs:
           ref: master
 
       - name: Install Nix
-        uses: DeterminateSystems/nix-installer-action@main
+        uses: DeterminateSystems/nix-installer-action@v22
         with:
           extra-conf: |
             extra-substituters = https://nix-community.cachix.org
@@ -69,7 +70,17 @@ jobs:
             trusted-users = root runner
 
       - name: Enable Magic Nix Cache
-        uses: DeterminateSystems/magic-nix-cache-action@main
+        uses: DeterminateSystems/magic-nix-cache-action@v13
+        with:
+          diagnostic-endpoint: ""
+          use-flakehub: false
+
+      - name: Setup Attic cache
+        uses: ryanccn/attic-action@v0.5.0
+        with:
+          endpoint: ${{ vars.ATTIC_ENDPOINT }}
+          cache: ${{ vars.ATTIC_CACHE }}
+          token: ${{ secrets.ATTIC_TOKEN }}
 
       - name: Show Nix cache config
         shell: bash
@@ -84,31 +95,9 @@ jobs:
         shell: bash
         env:
           UPDATE_NIXPKGS: ${{ steps.mode.outputs.update_nixpkgs }}
+          UPDATE_MODE: ${{ steps.mode.outputs.mode }}
         run: |
-          set -euo pipefail
-
-          summary_file="$(mktemp)"
-          status=0
-
-          nix run .#update-inputs-resilient 2>&1 | tee "$summary_file" || status="$?"
-
-          {
-            echo "summary<<EOF"
-            echo "Mode: ${{ steps.mode.outputs.mode }}"
-            echo
-            cat "$summary_file"
-            echo "EOF"
-          } >> "$GITHUB_OUTPUT"
-
-          {
-            echo "## Flake input update summary"
-            echo
-            echo "**Mode:** ${{ steps.mode.outputs.mode }}"
-            echo
-            cat "$summary_file"
-          } >> "$GITHUB_STEP_SUMMARY"
-
-          exit "$status"
+          nix run .#ci-update-inputs
 
       - name: Commit and push if changed
         shell: bash
@@ -127,8 +116,6 @@ jobs:
 
           {
             echo "Update flake inputs"
-            echo
-            echo "Mode: ${{ steps.mode.outputs.mode }}"
             echo
             echo "${{ steps.update.outputs.summary }}"
           } > /tmp/commit-message.txt
