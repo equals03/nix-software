@@ -1,0 +1,78 @@
+name: Update Flake Lock
+
+on:
+  workflow_dispatch:
+  schedule:
+    # Every Wednesday at 02:00 UTC
+    - cron: "0 2 * * 3"
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: update-flake-lock
+  cancel-in-progress: false
+
+jobs:
+  update-flake-lock:
+    runs-on: ubuntu-latest
+    environment: default
+    
+    steps:
+      - name: Checkout master
+        uses: actions/checkout@v4
+        with:
+          ref: master
+          token: ${{ secrets.GH_TOKEN_FOR_UPDATES }}
+
+      - name: Install Nix
+        uses: cachix/install-nix-action@v31.10.5
+        with:
+          github_access_token: ${{ secrets.GITHUB_TOKEN }}
+          extra-conf: |
+            extra-substituters = https://nix-community.cachix.org
+            extra-trusted-public-keys = nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs=
+            experimental-features = nix-command flakes
+            accept-flake-config = true
+
+      - name: Update flake.lock
+        shell: bash
+        run: |
+          set -euo pipefail
+          nix flake update
+
+      - name: Update non-flake package inputs
+        shell: bash
+        run: |
+          set -euo pipefail
+          nix run .#update-packages
+
+      - name: Create update PR
+        id: create-pr
+        uses: peter-evans/create-pull-request@v6
+        with:
+          token: ${{ secrets.GH_TOKEN_FOR_UPDATES }}
+          branch: update-flake-lock
+          base: master
+          delete-branch: true
+          title: "flake.lock: update"
+          commit-message: "flake.lock: update"
+          labels: |
+            dependencies
+            automated
+            flake
+          body: |
+            This updates:
+            - flake inputs via `nix flake update`
+            - non-flake package inputs via `nix run .#update-packages`
+
+      - name: Enable auto-merge
+        if: steps.create-pr.outputs.pull-request-number != ''
+        env:
+          GH_TOKEN: ${{ secrets.GH_TOKEN_FOR_UPDATES }}
+        run: |
+          gh pr merge "${{ steps.create-pr.outputs.pull-request-number }}" \
+            --auto \
+            --squash \
+            --delete-branch
