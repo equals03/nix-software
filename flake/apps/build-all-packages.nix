@@ -38,29 +38,10 @@
         }
       '';
     };
-
-    all-packages-build = pkgs.runCommand "all-packages-build" {} ''
-      mkdir -p "$out"
-
-      ${
-        if packageList == []
-        then ''
-          echo "No packages to check." > "$out/packages"
-        ''
-        else
-          lib.concatStringsSep "\n" (map (spec: ''
-              echo "checking ${lib.escapeShellArg spec.name}"
-              ln -s ${spec.pkg} "$out/${lib.escapeShellArg spec.name}"
-            '')
-            packageList)
-      }
-    '';
   in {
     apps.build-all-packages = {
       type = "app";
       program = "${build-all-packages}/bin/build-all-packages";
     };
-
-    checks.all-packages-build = all-packages-build;
   };
 }

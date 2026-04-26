@@ -16,7 +16,7 @@ concurrency:
 
 jobs:
   update-flake-lock:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-slim
     environment: default
     
     steps:
@@ -30,7 +30,7 @@ jobs:
         uses: cachix/install-nix-action@v31.10.5
         with:
           github_access_token: ${{ secrets.GITHUB_TOKEN }}
-          extra-conf: |
+          extra_nix_config: |
             extra-substituters = https://nix-community.cachix.org
             extra-trusted-public-keys = nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs=
             experimental-features = nix-command flakes
@@ -76,3 +76,4 @@ jobs:
             --auto \
             --squash \
             --delete-branch
+            --match-head-commit "${{ steps.create-pr.outputs.pull-request-head-sha }}"

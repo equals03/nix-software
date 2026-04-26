@@ -57,7 +57,6 @@
               help = "nix flake";
               command = "nix flake $@";
             }
-
             {
               category = "nix flake";
               name = "check";
@@ -67,16 +66,29 @@
 
             {
               category = "nix";
+              name = "fmt";
+              help = "nix fmt";
+              command = "nix fmt $@";
+            }
+
+            {
+              category = "build";
               name = "build";
               help = "nom build";
               command = "nom build $@";
             }
+            {
+              category = "build";
+              name = "build-all";
+              help = "nix run .#build-all-packages";
+              command = "nix run .#build-all-packages";
+            }
 
             {
-              category = "nix";
-              name = "fmt";
-              help = "nix fmt";
-              command = "nix fmt $@";
+              category = "cache";
+              name = "push";
+              help = "attic push software";
+              command = "attic push software $@";
             }
           ]
           ++ programs;
