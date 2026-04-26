@@ -6,16 +6,16 @@
   }:
     rustPlatform.buildRustPackage rec {
       pname = "lean-ctx";
-      version = "3.4.1";
+      version = "3.4.2";
 
       src = fetchFromGitHub {
         owner = "yvgude";
         repo = "lean-ctx";
         rev = "v${version}";
-        hash = "sha256-+RwUAA/hEqSlMb2CJ0bziZesBKSGaNQ1ibuKve0yM64=";
+        hash = "sha256-RLj97u0vh6mz+vAr75aznFljVmgCpR7XQ7lj9iwNm6E=";
       };
 
-      cargoHash = "sha256-uXEPQ7QuvBw3YXjGreyfVrQP2diByrW8EGtBOiy592c=";
+      cargoHash = "sha256-xP8EwIS6ZGeSi6sLGCggNw0OSjkYGTF0N80+dCIMwz8=";
       sourceRoot = "source/rust";
 
       doCheck = false;
