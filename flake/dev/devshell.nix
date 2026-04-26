@@ -74,14 +74,21 @@
             {
               category = "build";
               name = "build";
-              help = "nom build";
-              command = "nom build $@";
+              help = "nom build .#";
+              command = "nom build .#$@";
             }
             {
               category = "build";
               name = "build-all";
               help = "nix run .#build-all-packages";
-              command = "nix run .#build-all-packages";
+              command = "nix run .#build-all-packages $@";
+            }
+
+            {
+              category = "update";
+              name = "update";
+              help = "nix run .#update-packages";
+              command = "nix run .#update-packages $@";
             }
 
             {

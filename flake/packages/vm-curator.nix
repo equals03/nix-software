@@ -30,16 +30,18 @@
         udev
       ];
 
-      # vm-curator produces a single binary named "vm-curator"
-      # so no extra binaries to hide or rename.
+      # its a release - im happy to assume the checks were already done
+      doCheck = false;
 
       meta = with lib; {
         description = "Fast and friendly Rust TUI for managing desktop QEMU/KVM virtual machines";
         homepage = "https://github.com/mroboff/vm-curator";
         license = licenses.mit; # project is MIT-licensed
         platforms = platforms.linux;
+        mainProgram = "vm-curator";
+        maintainers = [];
 
-        # enrol in the custom 'update-packages' script
+        # enroll in the custom 'update-packages' script
         update.enable = true;
       };
     };

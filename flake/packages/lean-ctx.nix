@@ -18,6 +18,8 @@
       cargoHash = "sha256-xP8EwIS6ZGeSi6sLGCggNw0OSjkYGTF0N80+dCIMwz8=";
       sourceRoot = "source/rust";
 
+      # tests fail within the nix sandbox due to mutations
+      # TODO: selectively exclude failing tests
       doCheck = false;
 
       meta = with lib; {
@@ -25,8 +27,9 @@
         homepage = "https://github.com/yvgude/lean-ctx";
         license = licenses.asl20;
         mainProgram = "lean-ctx";
+        maintainers = [];
 
-        # enrol in the custom 'update-packages' script
+        # enroll in the custom 'update-packages' script
         update.enable = true;
       };
     };

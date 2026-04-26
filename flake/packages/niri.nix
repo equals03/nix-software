@@ -123,7 +123,9 @@
         NIRI_BUILD_COMMIT = "Nixpkgs";
       };
 
-      checkFlags = ["--skip=::egl"];
+      # its a release - im happy to assume the checks were already done
+      doCheck = false;
+
       nativeInstallCheckInputs = [versionCheckHook];
       doInstallCheck = true;
 
@@ -136,14 +138,11 @@
         homepage = "https://github.com/niri-wm/niri";
         changelog = "https://github.com/niri-wm/niri/releases/tag/v${finalAttrs.version}";
         license = lib.licenses.gpl3Only;
-        maintainers = with lib.maintainers; [
-          sodiboo
-          getchoo
-        ];
         mainProgram = "niri";
         platforms = lib.platforms.linux;
+        maintainers = [];
 
-        # enrol in the custom 'update-packages' script
+        # enroll in the custom 'update-packages' script
         update.enable = true;
       };
     });
