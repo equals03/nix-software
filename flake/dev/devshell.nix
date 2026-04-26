@@ -4,6 +4,7 @@
       curl
       git
       openssh
+      attic-client
     ];
   in {
     devshells = {

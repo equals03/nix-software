@@ -14,7 +14,6 @@
     cursor.url = "github:tylergets/cursor-flake";
     codex-cli.url = "github:sadjow/codex-cli-nix";
     pi-mono .url = "github:lukasl-dev/pi-mono.nix";
-    niri.url = "github:YaLTeR/niri";
     work-trunk.url = "github:max-sixty/worktrunk";
     xwayland-satellite.url = "github:Supreeeme/xwayland-satellite";
     zen-browser.url = "github:youwen5/zen-browser-flake";
