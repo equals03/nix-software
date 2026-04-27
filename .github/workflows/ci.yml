@@ -19,6 +19,7 @@ jobs:
     environment: default
 
     if: >
+      github.event_name == 'workflow_dispatch' ||
       github.event.pull_request.head.repo.full_name == github.repository
 
     steps:
@@ -57,10 +58,13 @@ jobs:
           set -euo pipefail
           nix flake check -L
 
-      - name: Full rebuild and push cache for flake update PR
+      - name: Full rebuild and push cache
         if: >
-          github.event_name == 'pull_request' &&
-          github.event.pull_request.head.ref == 'update-flake-lock'
+          github.event_name == 'workflow_dispatch' ||
+          (
+            github.event_name == 'pull_request' &&
+            github.event.pull_request.head.ref == 'update-flake-lock'
+          )
         shell: bash
         run: |
           set -euo pipefail
