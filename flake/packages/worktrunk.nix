@@ -4,7 +4,6 @@
     stdenv,
     fetchFromGitHub,
     rustPlatform,
-    gitMinimal,
     installShellFiles,
     versionCheckHook,
   }:
