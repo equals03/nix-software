@@ -10,13 +10,17 @@ permissions:
   contents: write
   pull-requests: write
 
+env:
+  EXTRA_SUBSTITUTERS: https://nix-community.cachix.org
+  EXTRA_TRUSTED_PUBLIC_KEYS: nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs=
+
 concurrency:
   group: update-flake-lock
   cancel-in-progress: false
 
 jobs:
   update-flake-lock:
-    runs-on: ubuntu-slim
+    runs-on: ubuntu-latest
     environment: default
     
     steps:
@@ -31,8 +35,8 @@ jobs:
         with:
           github_access_token: ${{ secrets.GITHUB_TOKEN }}
           extra_nix_config: |
-            extra-substituters = https://nix-community.cachix.org
-            extra-trusted-public-keys = nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs=
+            extra-substituters = ${{ env.EXTRA_SUBSTITUTERS }}
+            extra-trusted-public-keys = ${{ env.EXTRA_TRUSTED_PUBLIC_KEYS }}
             experimental-features = nix-command flakes
             accept-flake-config = true
 
@@ -75,5 +79,5 @@ jobs:
           gh pr merge "${{ steps.create-pr.outputs.pull-request-number }}" \
             --auto \
             --squash \
-            --delete-branch
+            --delete-branch \
             --match-head-commit "${{ steps.create-pr.outputs.pull-request-head-sha }}"

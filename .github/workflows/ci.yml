@@ -9,14 +9,18 @@ on:
 permissions:
   contents: read
 
+env:
+  EXTRA_SUBSTITUTERS: https://nix-community.cachix.org
+  EXTRA_TRUSTED_PUBLIC_KEYS: nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs=
+
 concurrency:
   group: ci-${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
-  nix-flake-check:
+  light-check:
+    name: Light check
     runs-on: ubuntu-latest
-    environment: default
 
     if: >
       github.event_name == 'workflow_dispatch' ||
@@ -31,26 +35,10 @@ jobs:
         with:
           github_access_token: ${{ secrets.GITHUB_TOKEN }}
           extra_nix_config: |
-            extra-substituters = https://nix-community.cachix.org
-            extra-trusted-public-keys = nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs=
+            extra-substituters = ${{ env.EXTRA_SUBSTITUTERS }}
+            extra-trusted-public-keys = ${{ env.EXTRA_TRUSTED_PUBLIC_KEYS }}
             experimental-features = nix-command flakes
             accept-flake-config = true
-            keep-outputs = true
-            keep-derivations = true
-            trusted-users = root runner
-
-      - name: Enable Magic Nix Cache
-        uses: DeterminateSystems/magic-nix-cache-action@v13
-        with:
-          diagnostic-endpoint: ""
-          use-flakehub: false
-
-      - name: Setup Attic cache
-        uses: ryanccn/attic-action@v0.5.0
-        with:
-          endpoint: ${{ vars.ATTIC_ENDPOINT }}
-          cache: ${{ vars.ATTIC_CACHE }}
-          token: ${{ secrets.ATTIC_TOKEN }}
 
       - name: Check flake
         shell: bash
@@ -58,14 +46,45 @@ jobs:
           set -euo pipefail
           nix flake check -L
 
-      - name: Full rebuild and push cache
-        if: >
-          github.event_name == 'workflow_dispatch' ||
-          (
-            github.event_name == 'pull_request' &&
-            github.event.pull_request.head.ref == 'update-flake-lock'
-          )
+  full-build-and-cache:
+    name: Full build and push cache
+    runs-on: ubuntu-latest
+    environment: default
+    needs: light-check
+
+    if: >
+      github.event_name == 'workflow_dispatch' ||
+      (
+        github.event_name == 'pull_request' &&
+        github.event.pull_request.head.repo.full_name == github.repository &&
+        github.event.pull_request.head.ref == 'update-flake-lock'
+      )
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install Nix
+        uses: cachix/install-nix-action@v31.10.5
+        with:
+          github_access_token: ${{ secrets.GITHUB_TOKEN }}
+          extra_nix_config: |
+            extra-substituters = ${{ env.EXTRA_SUBSTITUTERS }}
+            extra-trusted-public-keys = ${{ env.EXTRA_TRUSTED_PUBLIC_KEYS }}
+            experimental-features = nix-command flakes
+            accept-flake-config = true
+            keep-outputs = true
+            keep-derivations = true
+            trusted-users = root runner
+
+      - name: Full build with nix-fast-build and push to Attic
         shell: bash
+        env:
+          ATTIC_ENDPOINT: ${{ vars.ATTIC_ENDPOINT }}
+          ATTIC_CACHE: ${{ vars.ATTIC_CACHE }}
+          ATTIC_TOKEN: ${{ secrets.ATTIC_TOKEN }}
         run: |
           set -euo pipefail
-          nix run .#build-all-packages
+          nix develop .#ci -c attic-init
+          nix develop .#ci -c build-and-push
+

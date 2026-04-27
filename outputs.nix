@@ -20,6 +20,7 @@ flake-parts.lib.mkFlake {
     paths;
 
   modules = lib.pipe import-tree [
+    (i: i.addPath ./nix)
     (i: i.addPath ./flake)
     (i: i.withLib lib)
     (i:
@@ -46,13 +47,22 @@ in {
       "x86_64-linux"
     ];
 
-    perSystem = {system, ...}: {
-      config._module.args.pkgs = import nixpkgs {
-        inherit system;
-        config.allowUnfree = true;
-      };
+    perSystem = {
+      self',
+      system,
+      ...
+    }: {
+      config = {
+        _module.args.pkgs = import nixpkgs {
+          inherit system;
+          config.allowUnfree = true;
+        };
 
-      #checks.all-packages-build = self.apps.${system}.build-all-packages.program;
+        ci-checks = let
+          packages = lib.mapAttrs' (n: lib.nameValuePair "package-${n}") self'.packages;
+        in
+          packages;
+      };
     };
   };
 })

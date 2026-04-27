@@ -24,7 +24,7 @@
         '';
       in {
         inherit motd;
-        name = "nix flake shell";
+        name = "dev-shell";
 
         packages = with pkgs;
           essential
