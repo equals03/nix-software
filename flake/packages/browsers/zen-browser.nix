@@ -9,6 +9,7 @@
 
     prefs = {
       "zen.welcome-screen.seen" = true; # OOBE
+      "zen.view.use-single-toolbar" = false;
     };
 
     zen-browser-unwrapped = inputs.zen-browser.packages.${system}.zen-browser-unwrapped or null;

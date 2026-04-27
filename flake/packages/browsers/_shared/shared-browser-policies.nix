@@ -30,15 +30,6 @@
     # Disable sponsored Firefox Suggest / address-bar suggestions.
     "browser.urlbar.suggest.quicksuggest.sponsored" = false;
     "browser.urlbar.suggest.quicksuggest.nonsponsored" = false;
-    # Disable address-bar suggestions from browsing history.
-    # Optional: keep this true if you like history autocomplete.
-    "browser.urlbar.suggest.history" = false;
-    # Disable address-bar suggestions from bookmarks.
-    # Optional: keep this true if you like bookmark autocomplete.
-    "browser.urlbar.suggest.bookmark" = false;
-    # Disable address-bar suggestions from open tabs.
-    # Optional: keep this true if you like tab switching from the URL bar.
-    "browser.urlbar.suggest.openpage" = false;
     # Disable Pocket integration.
     "extensions.pocket.enabled" = false;
     # Disable studies/experiments.
