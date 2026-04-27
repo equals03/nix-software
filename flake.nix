@@ -1,11 +1,6 @@
 {
   outputs = inputs: import ./outputs.nix inputs;
 
-  #nixConfig = {
-  #  extraSubstituters = [];
-  #  extraTrustedPublicKeys = [];
-  #};
-
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/nixpkgs-unstable";
 
