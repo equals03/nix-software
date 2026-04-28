@@ -4,6 +4,7 @@
       curl
       git
       openssh
+      nix-fast-build
       attic-client
     ];
   in {

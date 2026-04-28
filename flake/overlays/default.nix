@@ -15,9 +15,8 @@
     if quiet || !older
     then mine
     else lib.warn "Potentially out of date package: `${mine.name}` < ${theirs.name}.";
-in {
-  # all the packages from my flake
-  flake.overlays.packages = overlay-with-system (
+
+  packages = overlay-with-system (
     {
       system,
       prev,
@@ -27,4 +26,10 @@ in {
     in
       lib.mapAttrs (name: mine: version-check mine (prev.${name} or mine)) packages
   );
+in {
+  # all the packages from my flake
+  flake.overlays = {
+    inherit packages;
+    default = packages;
+  };
 }

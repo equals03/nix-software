@@ -27,6 +27,14 @@
             name = "FLAKE";
             eval = "$PRJ_ROOT";
           }
+          {
+            name = "ATTIC_SERVER_NAME";
+            eval = ''''${ATTIC_SERVER_NAME:-equals03}'';
+          }
+          {
+            name = "ATTIC_CACHE";
+            eval = ''''${ATTIC_CACHE:-software}'';
+          }
         ];
 
         commands = [
@@ -48,15 +56,15 @@
                 --flake ".#ci-checks.${system}" \
                 --no-nom \
                 --skip-cached \
-                --attic-cache "default:''$ATTIC_CACHE"
+                --attic-cache "''$ATTIC_CACHE"
             '';
           }
           {
             category = "ci";
             name = "attic-init";
             command = ''
-              attic login default "''$ATTIC_ENDPOINT" "''$ATTIC_TOKEN" --set-default
-              attic use "default:''$ATTIC_CACHE"
+              attic login "''$ATTIC_SERVER_NAME" "''$ATTIC_ENDPOINT" "''$ATTIC_TOKEN" --set-default
+              attic use "''${ATTIC_SERVER_NAME}:''${ATTIC_CACHE}"
             '';
           }
         ];
