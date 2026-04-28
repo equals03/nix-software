@@ -8,8 +8,9 @@
     shared-browser-policies = import ./_shared/shared-browser-policies.nix {inherit lib;};
 
     prefs = {
-      "zen.welcome-screen.seen" = true; # OOBE
+      "zen.tabs.vertical.right-side" = true;
       "zen.view.use-single-toolbar" = false;
+      "zen.welcome-screen.seen" = true; # OOBE
     };
 
     zen-browser-unwrapped = inputs.zen-browser.packages.${system}.zen-browser-unwrapped or null;
@@ -18,7 +19,7 @@
     });
   in {
     packages = lib.optionalAttrs (zen-browser-unwrapped != null) {
-      inherit zen-browser;
+      inherit zen-browser zen-browser-unwrapped;
     };
   };
 }
