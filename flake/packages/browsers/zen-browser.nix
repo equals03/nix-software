@@ -13,12 +13,13 @@
       "zen.welcome-screen.seen" = true; # OOBE
     };
 
-    zen-browser-unwrapped = inputs.zen-browser.packages.${system}.zen-browser-unwrapped or null;
+    browsers = inputs.zen-browser.packages.${system} or null;
+    inherit (browsers) zen-browser-unwrapped;
     zen-browser = pkgs.wrapFirefox zen-browser-unwrapped (shared-browser-policies {
       inherit prefs;
     });
   in {
-    packages = lib.optionalAttrs (zen-browser-unwrapped != null) {
+    packages = lib.optionalAttrs (browsers != null) {
       inherit zen-browser zen-browser-unwrapped;
     };
   };
