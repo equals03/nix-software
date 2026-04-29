@@ -40,7 +40,7 @@ in {
     ...
   }: let
     code-cursor = pkgs.callPackage package {};
-    code-cursor-fhs = code-cursor.fhsWithPackages (ps: [ps.nixd ps.alejandra]);
+    code-cursor-fhs = code-cursor.fhs;
   in {
     packages = lib.optionalAttrs (builtins.elem system code-cursor.meta.platforms) {
       inherit code-cursor code-cursor-fhs;
