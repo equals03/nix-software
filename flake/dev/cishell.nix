@@ -45,7 +45,7 @@
               nix-fast-build \
                 --flake ".#ci-checks.${system}" \
                 --no-nom \
-                --skip-cached
+                --skip-cached $@
             '';
           }
           {
@@ -56,7 +56,7 @@
                 --flake ".#ci-checks.${system}" \
                 --no-nom \
                 --skip-cached \
-                --attic-cache "''$ATTIC_CACHE"
+                --attic-cache "''$ATTIC_CACHE" $@
             '';
           }
           {
