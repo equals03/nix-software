@@ -1,42 +1,82 @@
 {lib, ...}: let
   package = {
     buildFHSEnv,
-    writeShellScript,
+    #writeShellScript,
     neovim,
+    # Customize FHS environment
+    # Function that takes default buildFHSEnv arguments and returns modified arguments
+    customizeFHSEnv ? args: args,
   }: let
-    fhs = {additionalPkgs ? (_: []), ...}:
-      buildFHSEnv {
-        inherit (neovim) version;
-        meta = {
-          inherit (neovim.meta) license platforms;
-        };
+    fhs = {additionalPkgs ? _pkgs: []}: let
+      inherit (neovim) pname version;
+      inherit (neovim.meta) mainProgram;
 
-        name = "nvim-fhs";
+      defaultArgs = {
+        inherit pname version;
+        executableName = mainProgram;
+
+        # additional libraries which are commonly needed for extensions
         targetPkgs = pkgs:
-          [neovim]
-          ++ (with pkgs; [
+          (with pkgs; [
             glibc
             curl
             wl-clipboard
-          ])
-          ++ (additionalPkgs pkgs);
 
-        runScript = writeShellScript "nvim-fhs.sh" ''
-          exec ${neovim}/bin/nvim "$@"
+            # dotnet
+            curl
+            icu
+            libunwind
+            libuuid
+            lttng-ust
+            openssl
+            zlib
+          ])
+          ++ additionalPkgs pkgs;
+
+        extraBwrapArgs = [
+          "--bind-try /etc/nixos/ /etc/nixos/"
+          "--ro-bind-try /etc/xdg/ /etc/xdg/"
+        ];
+
+        # symlink shared assets, including icons and desktop entries
+        extraInstallCommands = ''
+          ln -s "${neovim}/share" "$out/"
         '';
+
+        runScript = "${neovim}/bin/${mainProgram}";
+
+        passthru = {
+          inherit pname version;
+        };
+
+        meta =
+          neovim.meta
+          // {
+            description = "Wrapped variant of ${pname} which launches in a FHS compatible environment, should allow for easy usage of extensions without nix-specific modifications";
+          };
       };
+      customizedArgs = customizeFHSEnv defaultArgs;
+    in
+      buildFHSEnv customizedArgs;
+
+    withPackages = additionalPkgs: fhs {inherit additionalPkgs;};
   in
-    fhs {} // {withPackages = additionalPkgs: fhs {inherit additionalPkgs;};};
+    neovim
+    // {
+      fhs = fhs {} // {inherit withPackages;};
+      fhsWithPackages = withPackages;
+    };
 in {
   perSystem = {
     pkgs,
     system,
     ...
   }: let
-    neovim-fhs = pkgs.callPackage package {};
+    neovim = pkgs.callPackage package {};
+    neovim-fhs = neovim.fhs;
   in {
     packages = lib.optionalAttrs (builtins.elem system neovim-fhs.meta.platforms) {
-      inherit neovim-fhs;
+      inherit neovim neovim-fhs;
     };
   };
 }
