@@ -6,7 +6,6 @@
     linux-pam,
     rustPlatform,
     systemdMinimal,
-    versionCheckHook,
     nixosTests,
   }:
     rustPlatform.buildRustPackage (finalAttrs: {
