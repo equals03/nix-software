@@ -3,14 +3,18 @@ name: Update Flake Lock
 on:
   workflow_dispatch:
   schedule:
-    # Every Wednesday at 02:00 UTC
     - cron: "0 2 * * 3"
+  pull_request:
+    types: [closed]
+    branches:
+      - master
 
 permissions:
   contents: write
   pull-requests: write
 
 env:
+  UPDATE_BRANCH: update-flake-lock
   EXTRA_SUBSTITUTERS: https://nix-community.cachix.org
   EXTRA_TRUSTED_PUBLIC_KEYS: nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs=
 
@@ -20,6 +24,7 @@ concurrency:
 
 jobs:
   update-flake-lock:
+    if: github.event_name == 'workflow_dispatch' || github.event_name == 'schedule'
     runs-on: ubuntu-latest
     environment: default
 
@@ -54,10 +59,10 @@ jobs:
 
       - name: Create update PR
         id: create-pr
-        uses: peter-evans/create-pull-request@v6
+        uses: peter-evans/create-pull-request@v8
         with:
           token: ${{ secrets.GH_TOKEN_FOR_UPDATES }}
-          branch: update-flake-lock
+          branch: ${{ env.UPDATE_BRANCH }}
           base: master
           title: "flake.lock: update"
           commit-message: "flake.lock: update"
@@ -75,8 +80,41 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GH_TOKEN_FOR_UPDATES }}
         run: |
+          set -euo pipefail
+
           gh pr merge "${{ steps.create-pr.outputs.pull-request-number }}" \
             --auto \
             --squash \
-            --delete-branch \
             --match-head-commit "${{ steps.create-pr.outputs.pull-request-head-sha }}"
+
+  cleanup-update-branch:
+    if: >
+      github.event_name == 'pull_request' &&
+      github.event.pull_request.merged == true &&
+      github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: write
+
+    steps:
+      - name: Delete update branch if it exists
+        env:
+          GH_TOKEN: ${{ secrets.GH_TOKEN_FOR_UPDATES }}
+          REPO: ${{ github.repository }}
+          UPDATE_BRANCH: ${{ env.UPDATE_BRANCH }}
+          PR_HEAD_REF: ${{ github.event.pull_request.head.ref }}
+        run: |
+          set -euo pipefail
+
+          if [[ "$PR_HEAD_REF" != "$UPDATE_BRANCH" ]]; then
+            echo "Not deleting branch '$PR_HEAD_REF'; expected '$UPDATE_BRANCH'."
+            exit 0
+          fi
+
+          if gh api "repos/$REPO/git/ref/heads/$UPDATE_BRANCH" >/dev/null 2>&1; then
+            gh api -X DELETE "repos/$REPO/git/refs/heads/$UPDATE_BRANCH"
+            echo "Deleted branch: $UPDATE_BRANCH"
+          else
+            echo "Branch does not exist: $UPDATE_BRANCH"
+          fi

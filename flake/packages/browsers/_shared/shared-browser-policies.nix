@@ -70,9 +70,6 @@
     # Disable geolocation prompts/API.
     # Optional: remove this if you use maps, delivery sites, weather, etc.
     "geo.enabled" = false;
-    # Disable WebRTC peer connections.
-    # Optional: this can break browser-based calls, video meetings, and some P2P web apps.
-    "media.peerconnection.enabled" = false;
     # Do not automatically disable extensions based on install scope.
     # Note: privacy-wise, 0 is less protective than the default because sideloaded extensions may stay enabled.
     # Consider using 15 unless you specifically need externally-installed extensions.
