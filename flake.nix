@@ -9,7 +9,11 @@
     cursor.url = "github:tylergets/cursor-flake";
     codex-cli.url = "github:sadjow/codex-cli-nix";
 
-    xwayland-satellite.url = "github:Supreeeme/xwayland-satellite";
+    pi = {
+      url = "github:tienedev/pi-mono-nix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
     zen-browser.url = "github:youwen5/zen-browser-flake";
 
     # infrastructure
