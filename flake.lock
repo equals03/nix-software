@@ -327,22 +327,6 @@
     },
     "nixpkgs_6": {
       "locked": {
-        "lastModified": 1769089682,
-        "narHash": "sha256-9yA/LIuAVQq0lXelrZPjLuLVuZdm03p8tfmHhnDIkms=",
-        "owner": "NixOS",
-        "repo": "nixpkgs",
-        "rev": "078d69f03934859a181e81ba987c2bb033eebfc5",
-        "type": "github"
-      },
-      "original": {
-        "owner": "NixOS",
-        "ref": "nixos-25.11",
-        "repo": "nixpkgs",
-        "type": "github"
-      }
-    },
-    "nixpkgs_7": {
-      "locked": {
         "lastModified": 1777268161,
         "narHash": "sha256-bxrdOn8SCOv8tN4JbTF/TXq7kjo9ag4M+C8yzzIRYbE=",
         "owner": "nixos",
@@ -357,6 +341,26 @@
         "type": "github"
       }
     },
+    "pi": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1778231110,
+        "narHash": "sha256-X6WmsFOwbpEHXbPeDGCVGWPtEQm8B+Sx+J6r+KB2cA0=",
+        "owner": "tienedev",
+        "repo": "pi-mono-nix",
+        "rev": "7b13429e973899ac1d3c06d1ac3856f61bf8cc68",
+        "type": "github"
+      },
+      "original": {
+        "owner": "tienedev",
+        "repo": "pi-mono-nix",
+        "type": "github"
+      }
+    },
     "root": {
       "inputs": {
         "codex-cli": "codex-cli",
@@ -367,8 +371,8 @@
         "import-tree": "import-tree",
         "nix-pax": "nix-pax",
         "nixpkgs": "nixpkgs_5",
+        "pi": "pi",
         "treefmt-nix": "treefmt-nix",
-        "xwayland-satellite": "xwayland-satellite",
         "zen-browser": "zen-browser"
       }
     },
@@ -382,27 +386,6 @@
         "owner": "oxalica",
         "repo": "rust-overlay",
         "rev": "4757db4358c77c1cbe878fa5990e6ea88d82f6b5",
-        "type": "github"
-      },
-      "original": {
-        "owner": "oxalica",
-        "repo": "rust-overlay",
-        "type": "github"
-      }
-    },
-    "rust-overlay_2": {
-      "inputs": {
-        "nixpkgs": [
-          "xwayland-satellite",
-          "nixpkgs"
-        ]
-      },
-      "locked": {
-        "lastModified": 1769222645,
-        "narHash": "sha256-gu6oZ86zLudBZMq8LL1qdtYt/S69GV5keQVXdvBrVSU=",
-        "owner": "oxalica",
-        "repo": "rust-overlay",
-        "rev": "22da29e7f3d8cff75009cbbcf992c7cb66920cfd",
         "type": "github"
       },
       "original": {
@@ -461,28 +444,9 @@
         "type": "github"
       }
     },
-    "xwayland-satellite": {
-      "inputs": {
-        "nixpkgs": "nixpkgs_6",
-        "rust-overlay": "rust-overlay_2"
-      },
-      "locked": {
-        "lastModified": 1773622265,
-        "narHash": "sha256-wToKwH7IgWdGLMSIWksEDs4eumR6UbbsuPQ42r0oTXQ=",
-        "owner": "Supreeeme",
-        "repo": "xwayland-satellite",
-        "rev": "a879e5e0896a326adc79c474bf457b8b99011027",
-        "type": "github"
-      },
-      "original": {
-        "owner": "Supreeeme",
-        "repo": "xwayland-satellite",
-        "type": "github"
-      }
-    },
     "zen-browser": {
       "inputs": {
-        "nixpkgs": "nixpkgs_7"
+        "nixpkgs": "nixpkgs_6"
       },
       "locked": {
         "lastModified": 1777612697,
