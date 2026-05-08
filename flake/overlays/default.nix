@@ -14,7 +14,7 @@
   in
     if quiet || !older
     then mine
-    else lib.warn "Potentially out of date package: `${mine.name}` < ${theirs.name}.";
+    else lib.warn "Potentially out of date package: `${mine.name}` < ${theirs.name}." mine;
 
   packages = overlay-with-system (
     {
