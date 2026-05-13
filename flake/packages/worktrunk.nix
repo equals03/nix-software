@@ -9,16 +9,16 @@
   }:
     rustPlatform.buildRustPackage (finalAttrs: {
       pname = "worktrunk";
-      version = "0.48.0";
+      version = "0.50.0";
 
       src = fetchFromGitHub {
         owner = "max-sixty";
         repo = "worktrunk";
         tag = "v${finalAttrs.version}";
-        hash = "sha256-iNviDjcYfBooXKGCXfW8feEDOHTIV/DYRHpAWSDU2xY=";
+        hash = "sha256-ZCcrTXVVbB61r2tMTFwN3x5+C1i6T/wn28dviGr5rtM=";
       };
 
-      cargoHash = "sha256-gQSJwbzJpWdXIaaTDIIgdxmOj0jQ/MkBMOdpEA7/RcI=";
+      cargoHash = "sha256-GTWoOaDjXS1Lu2JuWw1A/RYbPreivLYuhHhoWj4bFHM=";
 
       cargoBuildFlags = ["--package=worktrunk"];
 
