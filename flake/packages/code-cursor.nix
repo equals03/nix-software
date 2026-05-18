@@ -24,6 +24,13 @@
       };
     in {
       nativeBuildInputs = orig.nativeBuildInputs ++ [jq moreutils];
+
+      autoPatchelfIgnoreMissingDeps =
+        (orig.autoPatchelfIgnoreMissingDeps or [])
+        ++ [
+          "libc.musl-x86_64.so.1"
+        ];
+
       postInstall =
         (orig.postInstall or "")
         + ''
