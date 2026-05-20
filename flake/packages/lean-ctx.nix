@@ -6,16 +6,16 @@
   }:
     rustPlatform.buildRustPackage rec {
       pname = "lean-ctx";
-      version = "3.6.6";
+      version = "3.6.10";
 
       src = fetchFromGitHub {
         owner = "yvgude";
         repo = "lean-ctx";
         rev = "v${version}";
-        hash = "sha256-1EtJ+GCC05bVez79xhk52/Jc9ImnmtJN6DDfKVU2ApE=";
+        hash = "sha256-EhUMXsQYnhmNHwaVPDfGJWWmkrHB12TVSknr7s3gCMg=";
       };
 
-      cargoHash = "sha256-9k8V29weVH88CLEtLKq5HK1OiAUmsCVTyp8yJU4bMLM=";
+      cargoHash = "sha256-WBZfpmPcLt8VTlPn+md0f5muK8GbANdTm8GytMwwXGk=";
       sourceRoot = "source/rust";
 
       # tests fail within the nix sandbox due to mutations
