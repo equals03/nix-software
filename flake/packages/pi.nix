@@ -9,6 +9,7 @@
   in {
     packages = lib.optionalAttrs (pi != null) {
       pi = pi.override {
+        nodejs_20 = pkgs.nodejs;
         extraRuntimePackages = with pkgs; [
           fd
         ];
