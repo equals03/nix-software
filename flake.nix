@@ -9,6 +9,11 @@
     cursor.url = "github:tylergets/cursor-flake";
     codex-cli.url = "github:sadjow/codex-cli-nix";
 
+    hunk = {
+      url = "github:modem-dev/hunk";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
     pi = {
       url = "github:tienedev/pi-mono-nix";
       inputs.nixpkgs.follows = "nixpkgs";
