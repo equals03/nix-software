@@ -223,6 +223,24 @@
         "type": "github"
       }
     },
+    "flake-utils_3": {
+      "inputs": {
+        "systems": "systems_4"
+      },
+      "locked": {
+        "lastModified": 1731533236,
+        "narHash": "sha256-l0KFg5HjrsfsO/JpG+r7fRrqm12kzFHyUHqHCVpMMbI=",
+        "owner": "numtide",
+        "repo": "flake-utils",
+        "rev": "11707dc2f618dd54ca8739b309ec4fc024de578b",
+        "type": "github"
+      },
+      "original": {
+        "owner": "numtide",
+        "repo": "flake-utils",
+        "type": "github"
+      }
+    },
     "hunk": {
       "inputs": {
         "bun2nix": "bun2nix",
@@ -437,21 +455,22 @@
     },
     "pi": {
       "inputs": {
+        "flake-utils": "flake-utils_3",
         "nixpkgs": [
           "nixpkgs"
         ]
       },
       "locked": {
-        "lastModified": 1779572886,
-        "narHash": "sha256-4NrWActzZhT3Th3XCuA+vLJP885WDs+q1WXI2wKo3M0=",
-        "owner": "tienedev",
-        "repo": "pi-mono-nix",
-        "rev": "27f3d5bc1105290728bd295cd6ba4e9f495e7148",
+        "lastModified": 1782266720,
+        "narHash": "sha256-s2gygXE0JfPcheCK/jlwOSdoBmI1uEhPFmFCobpHdaI=",
+        "owner": "rbright",
+        "repo": "nix-pi-agent",
+        "rev": "5586371acb37ed4c75e1b50207b862183ca8f01c",
         "type": "github"
       },
       "original": {
-        "owner": "tienedev",
-        "repo": "pi-mono-nix",
+        "owner": "rbright",
+        "repo": "nix-pi-agent",
         "type": "github"
       }
     },
@@ -520,6 +539,21 @@
       }
     },
     "systems_3": {
+      "locked": {
+        "lastModified": 1681028828,
+        "narHash": "sha256-Vy1rq5AaRuLzOxct8nz4T6wlgyUR7zLU309k9mBC768=",
+        "owner": "nix-systems",
+        "repo": "default",
+        "rev": "da67096a3b9bf56a91d16901293e51ba5b49a27e",
+        "type": "github"
+      },
+      "original": {
+        "owner": "nix-systems",
+        "repo": "default",
+        "type": "github"
+      }
+    },
+    "systems_4": {
       "locked": {
         "lastModified": 1681028828,
         "narHash": "sha256-Vy1rq5AaRuLzOxct8nz4T6wlgyUR7zLU309k9mBC768=",

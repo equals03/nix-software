@@ -15,7 +15,7 @@
     };
 
     pi = {
-      url = "github:tienedev/pi-mono-nix";
+      url = "github:rbright/nix-pi-agent";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
