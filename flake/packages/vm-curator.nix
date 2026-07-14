@@ -9,14 +9,14 @@
   }:
     rustPlatform.buildRustPackage rec {
       pname = "vm-curator";
-      version = "1.1.0";
+      version = "1.2.0";
 
       src = fetchFromGitHub {
         owner = "mroboff";
         repo = "vm-curator";
         rev = "v${version}";
         # replace this hash with the actual one after first build
-        hash = "sha256-7XUUNUHe74uYMzIf7n98H2z4pq4RguBXFtpznrggtGk=";
+        hash = "sha256-wjhJ0x4kuNOc1IuHtlEsCfWyKnFNuEqPnKcZd+z3cGA=";
       };
 
       cargoLock = {

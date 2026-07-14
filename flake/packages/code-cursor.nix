@@ -8,11 +8,28 @@
     callPackage,
     jq,
     moreutils,
+    stdenv,
     ...
   }: let
+    buildVscode = callPackage "${pkgs.path}/pkgs/applications/editors/vscode/generic.nix" {};
     code-cursor = callPackage "${inputs.cursor}/cursor.nix" {
-      buildVscode = callPackage "${pkgs.path}/pkgs/applications/editors/vscode/generic.nix" {};
+      inherit buildVscode;
     };
+
+    ripgrepSystem =
+      {
+        x86_64-darwin = "darwin-x64";
+        aarch64-darwin = "darwin-arm64";
+        armv7l-linux = "linux-arm";
+        aarch64-linux = "linux-arm64";
+        i686-linux = "linux-ia32";
+        powerpc64-linux = "linux-ppc64";
+        riscv64-linux = "linux-riscv64";
+        s390x-linux = "linux-s390x";
+        x86_64-linux = "linux-x64";
+      }.${
+        stdenv.hostPlatform.system
+      } or (throw "Unknown system for ripgrep-universal: ${stdenv.hostPlatform.system}");
   in
     code-cursor.overrideAttrs (orig: let
       dest = "lib/cursor/resources/app";
@@ -30,6 +47,13 @@
         ++ [
           "libc.musl-x86_64.so.1"
         ];
+
+      # hack: seems like cursor is using ripgrep in another location?
+      postPatch =
+        lib.replaceStrings
+        ["@vscode/ripgrep-universal/bin/${ripgrepSystem}"]
+        ["@vscode/ripgrep/bin"]
+        (orig.postPatch or "");
 
       postInstall =
         (orig.postInstall or "")
