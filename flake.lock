@@ -463,11 +463,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1783645360,
-        "narHash": "sha256-BcqVybzTuuPcmXVW1XexVyFi9Cv0xEqfge5kFBb/I2w=",
+        "lastModified": 1784065001,
+        "narHash": "sha256-6wg494NrIgYXr0qNT6jHMsKgbyElfecJBVjb1LGz5Q8=",
         "owner": "rbright",
         "repo": "nix-pi-agent",
-        "rev": "82c1ff403554c3037f4f919d9aae8e053ef1118f",
+        "rev": "0f0fca5121d6d8fd6220191bb69a2d9ce734af8c",
         "type": "github"
       },
       "original": {
