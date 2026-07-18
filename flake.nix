@@ -9,6 +9,10 @@
     conch.url = "github:equals03/conch";
     cursor.url = "github:tylergets/cursor-flake";
     codex-cli.url = "github:sadjow/codex-cli-nix";
+    noctalia = {
+      url = "github:noctalia-dev/noctalia";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
 
     hunk = {
       url = "github:modem-dev/hunk";
