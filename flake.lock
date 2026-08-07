@@ -511,6 +511,7 @@
         "noctalia": "noctalia",
         "pi": "pi",
         "systems": "systems_5",
+        "t3code": "t3code",
         "treefmt-nix": "treefmt-nix_2",
         "zen-browser": "zen-browser"
       }
@@ -605,6 +606,26 @@
       "original": {
         "owner": "nix-systems",
         "repo": "default-linux",
+        "type": "github"
+      }
+    },
+    "t3code": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1786085534,
+        "narHash": "sha256-NYDHIg3ceAVCWW/RpicZj2FA/GQuH6/5k66zefu3yi4=",
+        "owner": "omarcresp",
+        "repo": "t3code-flake",
+        "rev": "4340ee8332683acfb1c3ef158618206e8120460f",
+        "type": "github"
+      },
+      "original": {
+        "owner": "omarcresp",
+        "repo": "t3code-flake",
         "type": "github"
       }
     },

@@ -25,6 +25,11 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
+    t3code = {
+      url = "github:omarcresp/t3code-flake";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
     zen-browser.url = "github:youwen5/zen-browser-flake";
 
     # infrastructure
