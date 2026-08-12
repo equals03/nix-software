@@ -13,14 +13,14 @@
   in
     stdenvNoCC.mkDerivation rec {
       pname = "lnko";
-      version = "0.2.3";
+      version = "0.2.4";
 
       src = fetchFromGitHub {
         owner = "luanvil";
         repo = "lnko";
         rev = "v${version}";
 
-        hash = "sha256-8kskzxgdSunrcaDIzUjGQgDZ5sz9Onr46nTNZNv+neg=";
+        hash = "sha256-8dM9ueWDPJpkZrH9BF+Q5EJv5M90wf7u0/ffYrUmuQ0=";
       };
 
       nativeBuildInputs = [
