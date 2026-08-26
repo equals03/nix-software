@@ -6,16 +6,16 @@
   }:
     rustPlatform.buildRustPackage rec {
       pname = "nmlinkd";
-      version = "0.2.1";
+      version = "0.4.0";
 
       src = fetchFromGitHub {
         owner = "SubZ69";
         repo = "nmlinkd";
         rev = "v${version}";
-        hash = "sha256-c7wylhuqIkyG4A3j6dR0GG3GT1uZZUXgDb1ShWClyGo=";
+        hash = "sha256-DllpsAHcyUprEeutR3QdKVxMAzvzIOX7/lqnFLBI1Bs=";
       };
 
-      cargoHash = "sha256-AAmGh4+PS31CjBB76yd44QOuQMxdTPXq9kn8iocHScA=";
+      cargoHash = "sha256-5prZ1Jm/7QIQVB7XHV+2USvACz69fcKm0w0DeqioTxk=";
 
       # tests fail within the nix sandbox due to mutations
       # TODO: selectively exclude failing tests
