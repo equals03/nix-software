@@ -295,6 +295,26 @@
         "type": "github"
       }
     },
+    "niri": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1789974527,
+        "narHash": "sha256-z2NJYe1zfVoFQKbkowMtBEr+m8al8oT3JVimA9N9Xow=",
+        "owner": "niri-wm",
+        "repo": "niri",
+        "rev": "8be4c6df68ddef2afd4ccdde7f27dbc782c30603",
+        "type": "github"
+      },
+      "original": {
+        "owner": "niri-wm",
+        "repo": "niri",
+        "type": "github"
+      }
+    },
     "nix-pax": {
       "inputs": {
         "flake-compat": "flake-compat",
@@ -506,6 +526,7 @@
         "flake-parts": "flake-parts",
         "hunk": "hunk",
         "import-tree": "import-tree_2",
+        "niri": "niri",
         "nix-pax": "nix-pax",
         "nixpkgs": "nixpkgs_5",
         "noctalia": "noctalia",

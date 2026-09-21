@@ -30,6 +30,11 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
+    niri = {
+      url = "github:niri-wm/niri";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
     xwayland-satellite = {
       url = "github:Supreeeme/xwayland-satellite/v0.8.1";
       inputs.nixpkgs.follows = "nixpkgs";
