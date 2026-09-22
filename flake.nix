@@ -36,7 +36,7 @@
     };
 
     xwayland-satellite = {
-      url = "github:Supreeeme/xwayland-satellite/v0.8.1";
+      url = "github:Supreeeme/xwayland-satellite";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
