@@ -4,10 +4,10 @@
     lib,
     ...
   }: let
-    xwayland-satellite = inputs.xwayland-satellite.packages.${system}.default or null;
+    xwayland-satellite-git = inputs.xwayland-satellite.packages.${system}.default or null;
   in {
-    packages = lib.optionalAttrs (xwayland-satellite != null) {
-      inherit xwayland-satellite;
+    packages = lib.optionalAttrs (xwayland-satellite-git != null) {
+      inherit xwayland-satellite-git;
     };
   };
 }
