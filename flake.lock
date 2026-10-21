@@ -243,26 +243,6 @@
         "type": "github"
       }
     },
-    "flake-utils_4": {
-      "inputs": {
-        "systems": [
-          "systems"
-        ]
-      },
-      "locked": {
-        "lastModified": 1731533236,
-        "narHash": "sha256-l0KFg5HjrsfsO/JpG+r7fRrqm12kzFHyUHqHCVpMMbI=",
-        "owner": "numtide",
-        "repo": "flake-utils",
-        "rev": "11707dc2f618dd54ca8739b309ec4fc024de578b",
-        "type": "github"
-      },
-      "original": {
-        "owner": "numtide",
-        "repo": "flake-utils",
-        "type": "github"
-      }
-    },
     "hunk": {
       "inputs": {
         "bun2nix": "bun2nix",
@@ -554,7 +534,6 @@
         "systems": "systems_5",
         "t3code": "t3code",
         "treefmt-nix": "treefmt-nix_2",
-        "ttt": "ttt",
         "xwayland-satellite": "xwayland-satellite",
         "zen-browser": "zen-browser"
       }
@@ -732,27 +711,6 @@
       "original": {
         "owner": "numtide",
         "repo": "treefmt-nix",
-        "type": "github"
-      }
-    },
-    "ttt": {
-      "inputs": {
-        "flake-utils": "flake-utils_4",
-        "nixpkgs": [
-          "nixpkgs"
-        ]
-      },
-      "locked": {
-        "lastModified": 1792562927,
-        "narHash": "sha256-ba7wfHDsUEnrbiYpIfhXk1A2/NxtDsAqiuVdIJuc41c=",
-        "owner": "eugenioenko",
-        "repo": "ttt",
-        "rev": "e7d990f6750e0a536b2b078740b4fbfd1d7b4512",
-        "type": "github"
-      },
-      "original": {
-        "owner": "eugenioenko",
-        "repo": "ttt",
         "type": "github"
       }
     },
