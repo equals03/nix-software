@@ -2,12 +2,14 @@ name: Update Flake Lock
 
 on:
   workflow_dispatch:
+    inputs:
+      package:
+        description: "Update this enrolled package only. Skips the lock bump. Empty updates the lock and every enrolled package."
+        required: false
+        default: ""
+        type: string
   schedule:
     - cron: "0 2 * * 3"
-  pull_request:
-    types: [closed]
-    branches:
-      - master
 
 permissions:
   contents: write
@@ -17,6 +19,13 @@ env:
   UPDATE_BRANCH: update-flake-lock
   EXTRA_SUBSTITUTERS: https://nix-community.cachix.org
   EXTRA_TRUSTED_PUBLIC_KEYS: nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs=
+  # Versions for packages enrolled with meta.update.enable.
+  VERSION_APPLY: |
+    pkgs:
+    let
+      names = builtins.filter (n: pkgs.${n}.meta.update.enable or false) (builtins.attrNames pkgs);
+    in
+      builtins.listToAttrs (map (n: { name = n; value = pkgs.${n}.version or ""; }) names)
 
 concurrency:
   group: update-flake-lock
@@ -24,7 +33,6 @@ concurrency:
 
 jobs:
   update-flake-lock:
-    if: github.event_name == 'workflow_dispatch' || github.event_name == 'schedule'
     runs-on: ubuntu-latest
     environment: default
 
@@ -45,38 +53,196 @@ jobs:
             experimental-features = nix-command flakes
             accept-flake-config = true
 
+      - name: Read dispatch input
+        id: request
+        env:
+          PACKAGE: "${{ github.event_name == 'workflow_dispatch' && inputs.package || '' }}"
+        run: |
+          set -euo pipefail
+          if [ -n "$PACKAGE" ] && [[ ! "$PACKAGE" =~ ^[A-Za-z0-9._-]+$ ]]; then
+            echo "invalid package name: $PACKAGE" >&2
+            exit 1
+          fi
+          if [ -n "$PACKAGE" ]; then
+            echo "update_lock=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "update_lock=true" >> "$GITHUB_OUTPUT"
+          fi
+          echo "package=$PACKAGE" >> "$GITHUB_OUTPUT"
+
+      - name: Record package versions
+        shell: bash
+        run: |
+          set -euo pipefail
+          system=$(nix eval --raw --impure --expr builtins.currentSystem)
+          nix eval --json ".#packages.${system}" --apply "$VERSION_APPLY" \
+            > "$RUNNER_TEMP/versions-before.json"
+
       - name: Update flake.lock
+        if: steps.request.outputs.update_lock == 'true'
         shell: bash
         run: |
           set -euo pipefail
           nix flake update
 
       - name: Update non-flake package inputs
+        id: packages
+        env:
+          PACKAGE: ${{ steps.request.outputs.package }}
         shell: bash
         run: |
           set -euo pipefail
-          nix run .#update-packages
+          log="$RUNNER_TEMP/update.log"
+          set +e
+          if [ -n "$PACKAGE" ]; then
+            nix run .#update-packages -- "$PACKAGE" 2>&1 | tee "$log"
+          else
+            nix run .#update-packages 2>&1 | tee "$log"
+          fi
+          code=${PIPESTATUS[0]}
+          set -e
+
+          : > "$RUNNER_TEMP/failed-packages.txt"
+          grep -E '^failed-update ' "$log" | cut -d' ' -f2 > "$RUNNER_TEMP/failed-packages.txt" || true
+
+          if [ "$code" -eq 0 ]; then
+            echo "failed=false" >> "$GITHUB_OUTPUT"
+          elif [ "$code" -eq 2 ]; then
+            echo "failed=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "update-packages exited $code" >&2
+            exit "$code"
+          fi
+
+      - name: Format updates
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [ -n "$(git status --porcelain)" ]; then
+            nix fmt
+          fi
+
+      - name: Write pull request body
+        id: note
+        env:
+          PACKAGE: ${{ steps.request.outputs.package }}
+          FAILED: ${{ steps.packages.outputs.failed }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          body="$RUNNER_TEMP/pr-body.md"
+
+          if [ -z "$(git status --porcelain)" ]; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          system=$(nix eval --raw --impure --expr builtins.currentSystem)
+          nix eval --json ".#packages.${system}" --apply "$VERSION_APPLY" \
+            > "$RUNNER_TEMP/versions-after.json"
+
+          lock_changed=false
+          if ! git diff --quiet HEAD -- flake.lock; then
+            lock_changed=true
+          fi
+
+          if [ "$lock_changed" = true ]; then
+            title="chore(flake): automated flake update"
+          elif [ -n "$PACKAGE" ]; then
+            title="chore(pkgs): update $PACKAGE"
+          else
+            title="chore(pkgs): update packages"
+          fi
+
+          {
+            if [ -n "$PACKAGE" ]; then
+              echo "Update \`$PACKAGE\`."
+            elif [ "$lock_changed" = true ]; then
+              echo "Update flake.lock and enrolled packages."
+            else
+              echo "Update enrolled packages."
+            fi
+            echo
+
+            if [ "$lock_changed" = true ]; then
+              echo "Flake lock:"
+              echo
+              echo '```text'
+              jq -rn --slurpfile old <(git show HEAD:flake.lock) --slurpfile new flake.lock '
+                def short:
+                  if . == null then "(none)"
+                  else
+                    ((.rev // .narHash // "?") | .[0:12])
+                    + (if (.lastModified // null) == null then ""
+                       else " (" + ((.lastModified | todate)[0:10]) + ")"
+                       end)
+                  end;
+                ($old[0].nodes) as $o | ($new[0].nodes) as $n
+                | ($o + $n | keys[]) as $k
+                | select($k != "root")
+                | select($o[$k].locked != $n[$k].locked)
+                | "- \($k): \($o[$k].locked | short) -> \($n[$k].locked | short)"
+              '
+              echo '```'
+              echo
+            fi
+
+            rows=$(jq -nr --slurpfile before "$RUNNER_TEMP/versions-before.json" --slurpfile after "$RUNNER_TEMP/versions-after.json" '
+              ($before[0] + $after[0] | keys[]) as $k
+              | select($before[0][$k] != $after[0][$k])
+              | "| `\($k)` | `\($before[0][$k] // "none")` | `\($after[0][$k] // "none")` |"
+            ')
+            if [ -n "$rows" ]; then
+              echo "Packages:"
+              echo
+              echo "| Package | Before | After |"
+              echo "|---|---|---|"
+              echo "$rows"
+              echo
+            fi
+
+            echo "Files:"
+            echo
+            {
+              git diff --name-only HEAD
+              git ls-files --others --exclude-standard
+            } | sort -u | sed 's/^/- /'
+            echo
+
+            if [ -s "$RUNNER_TEMP/failed-packages.txt" ]; then
+              echo "Failed updates, left unchanged:"
+              echo
+              while IFS= read -r name; do
+                echo "- \`$name\`"
+              done < "$RUNNER_TEMP/failed-packages.txt"
+              echo
+            elif [ "$FAILED" = true ]; then
+              echo "A package update failed before it named a package."
+              echo
+            fi
+          } > "$body"
+
+          echo "changed=true" >> "$GITHUB_OUTPUT"
+          echo "title=$title" >> "$GITHUB_OUTPUT"
 
       - name: Create update PR
         id: create-pr
+        if: steps.note.outputs.changed == 'true'
         uses: peter-evans/create-pull-request@v8
         with:
           token: ${{ secrets.GH_TOKEN_FOR_UPDATES }}
           branch: ${{ env.UPDATE_BRANCH }}
           base: master
-          title: "chore(flake): automated flake update"
-          commit-message: "chore(flake): automated flake update"
+          title: ${{ steps.note.outputs.title }}
+          commit-message: ${{ steps.note.outputs.title }}
+          body-path: ${{ runner.temp }}/pr-body.md
           labels: |
             dependencies
             automated
             flake
-          body: |
-            This updates:
-            - flake inputs via `nix flake update`
-            - non-flake package inputs via `nix run .#update-packages`
 
       - name: Enable auto-merge
-        if: steps.create-pr.outputs.pull-request-number != ''
+        if: steps.create-pr.outputs.pull-request-number != '' && steps.packages.outputs.failed != 'true'
         env:
           GH_TOKEN: ${{ secrets.GH_TOKEN_FOR_UPDATES }}
         run: |
@@ -86,3 +252,7 @@ jobs:
             --auto \
             --squash \
             --match-head-commit "${{ steps.create-pr.outputs.pull-request-head-sha }}"
+
+      - name: Fail if a package update failed
+        if: always() && steps.packages.outputs.failed == 'true'
+        run: exit 1
