@@ -8,11 +8,11 @@
   }:
     stdenv.mkDerivation (finalAttrs: {
       pname = "noodle";
-      version = "0.10.2";
+      version = "0.10.3";
 
       src = fetchurl {
         url = "https://github.com/wilfredinni/noodle/releases/download/v${finalAttrs.version}/noodle-linux-x86_64";
-        hash = "sha256-X9suVTAWJTVYhAKl/QrG068AstWvldkm0zA9DhyE+y4=";
+        hash = "sha256-b/NkAp+FmHbmuSMyluBiY1zWXemE2XwFpXP2Y3OUIKk=";
       };
 
       dontUnpack = true;
