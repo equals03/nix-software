@@ -6,9 +6,19 @@
     systems.url = "github:nix-systems/default-linux";
 
     # software
-    conch.url = "github:equals03/conch";
-    cursor.url = "github:tylergets/cursor-flake";
-    codex-cli.url = "github:sadjow/codex-cli-nix";
+    conch = {
+      url = "github:equals03/conch";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+    cursor = {
+      url = "github:tylergets/cursor-flake";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
+    codex-cli = {
+      url = "github:sadjow/codex-cli-nix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
     noctalia = {
       url = "github:noctalia-dev/noctalia";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -40,7 +50,10 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    zen-browser.url = "github:youwen5/zen-browser-flake";
+    zen-browser = {
+      url = "github:youwen5/zen-browser-flake";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
 
     # infrastructure
     flake-parts.url = "github:hercules-ci/flake-parts";
