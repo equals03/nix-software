@@ -7,7 +7,7 @@
   }:
     buildGoModule (finalAttrs: {
       pname = "ttt";
-      version = "1.8.0";
+      version = "1.12.1";
 
       src = fetchFromGitHub {
         owner = "eugenioenko";

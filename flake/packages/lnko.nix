@@ -13,7 +13,7 @@
   in
     stdenvNoCC.mkDerivation rec {
       pname = "lnko";
-      version = "0.2.4";
+      version = "0.6.0";
 
       src = fetchFromGitHub {
         owner = "luanvil";
