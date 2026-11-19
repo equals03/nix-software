@@ -5,6 +5,7 @@
       git
       openssh
       nix-fast-build
+      nix-update
       attic-client
     ];
   in {
