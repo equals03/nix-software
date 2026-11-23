@@ -5,6 +5,18 @@
     ...
   }: let
     packages = self'.packages or {};
+    # 1.17.0 fixes `--flake` with Nix 2.35; drop once nixpkgs has it.
+    nix-update = pkgs.nix-update.overridePythonAttrs (old: rec {
+      version = "1.17.0";
+      src = pkgs.fetchFromGitHub {
+        owner = "Mic92";
+        repo = "nix-update";
+        tag = "v${version}";
+        hash = "sha256-TCOhUWb53V3nrJRD3JuADly1U9fNi0Z79QMcjhbefHg=";
+      };
+      build-system = [pkgs.python3Packages.hatchling];
+      dependencies = (old.dependencies or []) ++ [pkgs.python3Packages.ast-grep-py];
+    });
 
     updatable = lib.filterAttrs (_: pkg: pkg.meta.update.enable or false) packages;
 
@@ -38,7 +50,7 @@
 
     update-packages = pkgs.writeShellApplication {
       name = "update-packages";
-      runtimeInputs = [pkgs.nix-update pkgs.gitMinimal];
+      runtimeInputs = [nix-update pkgs.gitMinimal];
       text = ''
         set -euo pipefail
 
