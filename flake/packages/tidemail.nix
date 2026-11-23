@@ -8,16 +8,16 @@
   }:
     buildGoModule (finalAttrs: {
       pname = "tidemail";
-      version = "1.9.1";
+      version = "1.10.1";
 
       src = fetchFromGitHub {
         owner = "allisonhere";
         repo = "tidemail";
         tag = "v${finalAttrs.version}";
-        hash = "sha256-6OpZ20WANUGSKJokxv9W0ZMPlSHf/p1kjEFVpxofoI4=";
+        hash = "sha256-h+0oQb5B6EktNa7wNuUdGOPrKoOkMWAr/p9Eox0c6PI=";
       };
 
-      vendorHash = "sha256-6IWEeiKtlqlhFyPtdKFILs8KH7U6d0/nDr56y9gpgv4=";
+      vendorHash = "sha256-Ku3EWZ70b950XbJuDTvOOXF32Upk0CkbmiezXWuipoU=";
 
       # Upstream release builds also link in a Google OAuth client. This
       # package does not. Set TIDEMAIL_GOOGLE_CLIENT_ID and
