@@ -8,13 +8,13 @@
   }:
     buildGoModule (finalAttrs: {
       pname = "tidemail";
-      version = "1.10.1";
+      version = "1.10.2";
 
       src = fetchFromGitHub {
         owner = "allisonhere";
         repo = "tidemail";
         tag = "v${finalAttrs.version}";
-        hash = "sha256-h+0oQb5B6EktNa7wNuUdGOPrKoOkMWAr/p9Eox0c6PI=";
+        hash = "sha256-NCSsMb17kB2YYyiuSvi7UMh8l6tAyMvZu9RCGEydats=";
       };
 
       vendorHash = "sha256-Ku3EWZ70b950XbJuDTvOOXF32Upk0CkbmiezXWuipoU=";
