@@ -55,6 +55,10 @@
       url = "github:niri-wm/niri";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    niri-fork = {
+      url = "github:equals03/niri?ref=feat/open-on-launch-workspace";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
 
     xwayland-satellite = {
       url = "github:Supreeeme/xwayland-satellite";
